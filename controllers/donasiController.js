@@ -4,7 +4,7 @@ const { errorHttp } = require('../middlewares/errorHandler');
 
 const LIMIT_DEFAULT = 10;
 const LIMIT_MAKS = 50;
-const FIELD_SORT = ['kode', 'nama', 'createdAt'];
+const FIELD_SORT = ['noDonasi', 'namaDonatur', 'createdAt'];
 const FIELD_BOLEH_DIPILIH = ['noDonasi', 'namaDonatur', 'nominal', 'jenis','kontak','programId', 'createdAt'];
 
 // Mengubah bilangan dari query string menjadi bilangan bulat yang aman
@@ -16,9 +16,8 @@ function angkaAman(nilai, bawaan, min, maks) {
 
 exports.create = async (req, res) => {
   try {
-    
     const donasi = await Donasi.create(req.body);
-    res.status(201).json(donasi );
+    res.status(201).json(donasi);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -26,11 +25,11 @@ exports.create = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   const filter = {};
-  if(req.query.telepon){
-    filter['kontak.telepon'] = String(req.query.telepon);
+  if(req.query.email){
+    filter['kontak.email'] = String(req.query.email);
   }
-  if (req.query.email) {
-    const program = await Program.findOne({ email: String(req.query.email).toUpperCase() });
+  if (req.query.program) {
+    const program = await Program.findOne({ kode: String(req.query.program).toUpperCase() });
     // Kode program tidak dikenal -> hasil kosong ($in: [] tidak cocok dengan apa pun)
     filter.programId = program ? program._id : { $in: [] };
   }
@@ -73,7 +72,7 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-  const data = await Donasi.findById(req.params.id).populate('programId', 'kode nama' );
+  const data = await Donasi.findById(req.params.id).populate('programId');
   if (!data) throw errorHttp(404, 'Data tidak ditemukan');
   res.json(data);
 };

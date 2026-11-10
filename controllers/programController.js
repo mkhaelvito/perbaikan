@@ -1,4 +1,4 @@
-const Prodi = require('../models/programModel');
+const Program = require('../models/programModel');
 
 exports.create = async (req, res) => {
   try {
